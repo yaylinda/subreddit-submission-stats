@@ -20,6 +20,22 @@ weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 hours = range(0, 24)
 
 """
+Helper function to ensure input subreddit string is a valid subreddit.
+
+    Input:
+        - subreddit: subreddit string
+
+    Returns:
+        - boolean of whether or not subreddit is valid
+"""
+def validate_subreddit(subreddit):
+
+    # TODO - validate subreddit
+
+    return True
+
+
+"""
 """
 def generate_data(subreddit, days=10):
 
@@ -78,7 +94,7 @@ def transform_data(subreddit, data, column):
         for hour in hours:
             values = transformed[weekday][hour]
             stats = calculate_stats(values)
-            means_for_day.append(stats[0])
+            means_for_day.append(stats)
 
         means.append(means_for_day)
 

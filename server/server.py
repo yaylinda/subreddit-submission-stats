@@ -17,10 +17,10 @@ Obtain data and transform into valid format for Plotly.js.
     Output:
         - JSON
 """
-@app.route('/generate/<subreddit>/<days>/<stat>', methods = ['GET'])
-def generate(subreddit, days, stat):
+@app.route('/generate/<subreddit>/<days>', methods = ['GET'])
+def generate(subreddit, days):
 
-    print('Generating data and plot... [subreddit = %s] [days = %s] [stat = %s]' % (subreddit, days, stat))
+    print('Generating data and plot... [subreddit = %s] [days = %s]' % (subreddit, days))
 
     # Make sure Subreddit is valid
     if not validate_subreddit(subreddit):
@@ -28,56 +28,32 @@ def generate(subreddit, days, stat):
             status = 'ERROR',
             message = 'Incorrect value for [subreddit].',
             subreddit = subreddit, 
-            days = days,
-            stat = stat
+            days = days
         )
 
     # Obtain raw data using pushshift.io
     data = generate_data(str(subreddit), int(days))
 
     # Transform data for plotting
-    if stat.upper() == 'SCORE':
-        score_means = transform_data(subreddit, data, column_names[3])
-        score_means.reverse() # reverse data for day of the week
-        return jsonify(
-            status = 'SUCCESS',
-            means = score_means,
-            subreddit = subreddit,
-            days = days,
-            stat = stat.upper())
-    elif stat.upper() == 'COMMENT':
-        num_comments_means = transform_data(subreddit, data, column_names[1])
-        num_comments_means.reverse() # reverse data for day of the week
-        return jsonify(
-            status = 'SUCCESS',
-            means = num_comments_means,
-            subreddit = subreddit, 
-            days = days,
-            stat = stat.upper())
-    else:
-        return jsonify(
-            status = 'ERROR',
-            message = 'Incorrect value for [stat]. Must be one of [SCORE, COMMENT].',
-            subreddit = subreddit, 
-            days = days,
-            stat = stat
-        )
+    score_means = transform_data(subreddit, data, column_names[3])
+    score_means.reverse() # reverse data for day of the week
 
+    num_comments_means = transform_data(subreddit, data, column_names[1])
+    num_comments_means.reverse() # reverse data for day of the week
 
-"""
-Helper function to ensure input subreddit string is a valid subreddit.
+    return jsonify(
+        status = 'SUCCESS',
+        scores = score_means,
+        comments = num_comments_means,
+        subreddit = subreddit,
+        days = days)
 
-    Input:
-        - subreddit: subreddit string
-
-    Returns:
-        - boolean of whether or not subreddit is valid
-"""
-def validate_subreddit(subreddit):
-
-    # TODO - validate subreddit
-
-    return True
+    # return jsonify(
+    #     status = 'ERROR',
+    #     message = 'Incorrect value for [stat]. Must be one of [SCORE, COMMENT].',
+    #     subreddit = subreddit, 
+    #     days = days
+    # )
 
 """
 Start server

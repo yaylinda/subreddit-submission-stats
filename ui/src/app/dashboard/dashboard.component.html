@@ -1,0 +1,27 @@
+<div>
+    <form (ngSubmit)="onSubmit()" #requestForm="ngForm">
+
+        <div class="form-group">
+            <label for="name">Subreddit</label>
+            <input type="text" class="form-control" id="subreddit" required [(ngModel)]="requestFormSubreddit" name="subreddit" #name="ngModel">
+        </div>
+
+        <div class="form-group">
+            <label for="name">Number of Days</label>
+            <input type="number" min=1 class="form-control" id="days" required [(ngModel)]="requestFormDays" name="days" #name="ngModel">
+        </div>
+
+        <div class="form-group">
+            <label for="name">Statistic</label>
+            <input type="radio" class="form-control" id="stat" required [(ngModel)]="requestFormStat" name="stat" #name="ngModel" value="SCORE">Score
+            <input type="radio" class="form-control" id="stat" required [(ngModel)]="requestFormStat" name="stat" #name="ngModel" value="COMMENT">Number of Comments
+        </div>
+
+        <button type="submit" class="btn btn-success" [disabled]="!requestForm.form.valid">Submit</button>
+    </form>
+
+    <div #meanchart>
+        <!-- Chart will appear here -->
+    </div>
+    
+</div>

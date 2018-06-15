@@ -5,11 +5,11 @@
     <form (ngSubmit)="onSubmit()" #requestForm="ngForm">
 
         <div class="form-group">
-            <input placeholder="Subreddit" type="text" class="form-control" id="subreddit" required [(ngModel)]="requestFormSubreddit" name="subreddit" #name="ngModel">
+            <input placeholder="Subreddit (e.g. pokemon)" type="text" class="form-control" id="subreddit" required [(ngModel)]="requestFormSubreddit" name="subreddit" #name="ngModel">
         </div>
 
         <div class="form-group">
-            <input placeholder="Days" type="number" min=1 class="form-control" id="days" required [(ngModel)]="requestFormDays" name="days" #name="ngModel">
+            <input placeholder="Days (e.g. 10)" type="number" min=1 class="form-control" id="days" required [(ngModel)]="requestFormDays" name="days" #name="ngModel">
         </div>
 
         <button type="submit" class="btn btn-success" [disabled]="!requestForm.form.valid || !submitAvailable || requestFormDays <= 1">{{ buttonText }}</button>

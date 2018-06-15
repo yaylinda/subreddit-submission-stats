@@ -5,19 +5,9 @@ import requests
 import statistics
 import plotly
 import plotly.graph_objs as go
+import time
 
-column_names = [
-    'created_utc',
-    'num_comments',
-    'domain',
-    'score',
-    'hour',
-    'weekday'
-]
-
-weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
-
-hours = range(0, 24)
+from constants import *
 
 """
 Helper function to ensure input subreddit string is a valid subreddit.
@@ -41,24 +31,25 @@ def generate_data(subreddit, days=10):
 
     print('[use_pushshift] Obtaining submissions from [/r/%s]' % subreddit)
 
-    url_template = 'https://api.pushshift.io/reddit/search/submission?subreddit=%s&before=%sd&after=%sd&size=1000&score=>1'
     data = []
+
+    start = time.time()
 
     for i in range(0, int(days)):
 
-        url = url_template % (subreddit, str(i), str(i+1))
+        url = URL_TEMPLATE % (subreddit, str(i), str(i+1))
 
         r = requests.get(url)
         
         data_per_day = 0
         for submission in r.json()['data']:
             datum = {}
-            for col_name in column_names:
+            for col_name in COLUMN_NAMES:
             
-                if col_name == column_names[4]:
-                    datum[column_names[4]] = int(datetime.datetime.fromtimestamp(datum['created_utc']).strftime('%H'))
-                elif col_name == column_names[5]:
-                    datum[column_names[5]] = datetime.datetime.fromtimestamp(datum['created_utc']).strftime('%a')
+                if col_name == COLUMN_NAMES[4]:
+                    datum[COLUMN_NAMES[4]] = int(datetime.datetime.fromtimestamp(datum['created_utc']).strftime('%H'))
+                elif col_name == COLUMN_NAMES[5]:
+                    datum[COLUMN_NAMES[5]] = datetime.datetime.fromtimestamp(datum['created_utc']).strftime('%a')
                 else:
                     datum[col_name] = submission[col_name]
 
@@ -67,6 +58,7 @@ def generate_data(subreddit, days=10):
 
         print('\tObtained %s data points [before=%sd] [after=%sd]' % (str(data_per_day), str(i), str(i+1)))
 
+    print('Took %d seconds.' % (time.time() - start))
     return data
 
 """
@@ -76,22 +68,22 @@ def transform_data(subreddit, data, column):
     print('Aggregating data for [subreddit=%s] [column=%s]' % (subreddit, column))
 
     transformed = {}
-    for weekday in weekdays:
+    for weekday in WEEKDAYS:
         transformed[weekday] = {}
-        for hour in hours:
+        for hour in HOURS:
             transformed[weekday][hour] = []
 
     for datum in data:
-        weekday = datum[column_names[5]]
-        hour = int(datum[column_names[4]])
+        weekday = datum[COLUMN_NAMES[5]]
+        hour = int(datum[COLUMN_NAMES[4]])
         value = datum[column]
         transformed[weekday][hour].append(value)
 
     means = []
-    for weekday in weekdays:
+    for weekday in WEEKDAYS:
         means_for_day = []
 
-        for hour in hours:
+        for hour in HOURS:
             values = transformed[weekday][hour]
             stats = calculate_stats(values)
             means_for_day.append(stats)
@@ -119,16 +111,16 @@ def write_data_to_csv(subreddit, data):
 
     csv_file = open(filename, 'w')
     csv_writer = csv.writer(csv_file, delimiter=',')
-    csv_writer.writerow(column_names)
+    csv_writer.writerow(COLUMN_NAMES)
     
     for datum in data:
         csv_writer.writerow([
-            datum[column_names[0]], 
-            datum[column_names[1]], 
-            datum[column_names[2]], 
-            datum[column_names[3]],
-            datum[column_names[4]],
-            datum[column_names[5]],
+            datum[COLUMN_NAMES[0]], 
+            datum[COLUMN_NAMES[1]], 
+            datum[COLUMN_NAMES[2]], 
+            datum[COLUMN_NAMES[3]],
+            datum[COLUMN_NAMES[4]],
+            datum[COLUMN_NAMES[5]],
         ])
 
     csv_file.close()
@@ -145,14 +137,14 @@ def plot_data(data_to_plot, subreddit, column, stat):
     image_filename = 'plots/%s_%s_%s' % (subreddit, column, stat)
 
     data_to_plot.reverse()
-    weekdays.reverse()
+    WEEKDAYS.reverse()
 
     plotly.offline.plot(
         {
             "data" : [go.Heatmap(
                 z = data_to_plot,
-                x = [str(h) for h in hours],
-                y = weekdays,
+                x = [str(h) for h in HOURS],
+                y = WEEKDAYS,
                 colorscale = 'Viridis')],
             "layout" : go.Layout(
                 title = title,
@@ -175,12 +167,14 @@ if __name__ == '__main__':
         days = 10
     data = generate_data(subreddit, days)
 
+    print(data)
+
     # Write data to CSV
-    write_data_to_csv(subreddit, data)
+    # write_data_to_csv(subreddit, data)
 
     # Get data for plotting
-    score_means = transform_data(subreddit, data, column_names[3])
-    num_comments_means = transform_data(subreddit, data, column_names[1])
+    # score_means = transform_data(subreddit, data, COLUMN_NAMES[3])
+    # num_comments_means = transform_data(subreddit, data, COLUMN_NAMES[1])
 
     # Plot data
     # plot_data(score_means, subreddit, 'Score', 'Mean')

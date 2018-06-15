@@ -1,5 +1,6 @@
 import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { environment } from '../../environments/environment';
 
 @Component({
   selector: 'app-dashboard',
@@ -11,16 +12,20 @@ export class DashboardComponent implements OnInit {
   @ViewChild('meanscores') meanScoresElementRef: ElementRef;
   @ViewChild('meancomments') meanCommentsElementRef: ElementRef;
 
-  baseUrl = 'http://localhost:5000/generate/';
+  baseUrl = 'http://' + environment.serverUrl + ':5000/generate/';
+
   submitted = false;
+  submitAvailable = true;
+  buttonText = 'Submit';
+
   requestFormSubreddit;
   requestFormDays;
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
   ngOnInit() {
-    this.plotChart(this.meanScoresElementRef.nativeElement, [], 'N/A');
-    this.plotChart(this.meanCommentsElementRef.nativeElement, [], 'N/A');
+    // this.plotChart(this.meanScoresElementRef.nativeElement, [], '<SUBREDDIT>', '<DAYS>', 'Score');
+    // this.plotChart(this.meanCommentsElementRef.nativeElement, [], '<SUBREDDIT>', '<DAYS>', 'Comments');
   }
 
   onSubmit() {
@@ -28,21 +33,32 @@ export class DashboardComponent implements OnInit {
     console.log(this.requestFormDays)
 
     this.submitted = true;
+    this.submitAvailable = false;
+    this.buttonText = 'Processing...';
     
     this.http.get(this.baseUrl + this.requestFormSubreddit + '/' + this.requestFormDays)
       .subscribe((result) => {
+
         this.submitted = false;
+        this.submitAvailable = true;
+        this.buttonText = 'Submit';
+
+        console.log(result)
+
+        let scores_data = [];
+        let comments_data = [];
         if (result['status'] === 'SUCCESS') {
-          console.log(result)
-          this.plotChart(this.meanScoresElementRef.nativeElement, result['means'], 'Score');
-          this.plotChart(this.meanCommentsElementRef.nativeElement, result['comments'], 'Number of Comments');
-        } else {
-          console.error('ERROR');
+          scores_data = result['scores'];
+          comments_data = result['comments']
         }
+
+        this.plotChart(this.meanScoresElementRef.nativeElement, scores_data, result['subreddit'], result['days'], 'Score');
+        this.plotChart(this.meanCommentsElementRef.nativeElement, comments_data, result['subreddit'], result['days'], 'Comments');
+
       })
   }
 
-  plotChart(element, means, statString) {
+  plotChart(element, means, subreddit, days, statString) {
 
     const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].reverse();
     const hours = Array.from(new Array(24), (val,index) => `${index}`);
@@ -57,7 +73,7 @@ export class DashboardComponent implements OnInit {
     ];
 
     var layout = {
-      title: 'Mean ' + statString + ' of /r/' + this.requestFormSubreddit + ' Submissions in the Past ' + this.requestFormDays + ' Days',
+      title: 'Mean ' + statString + ' of /r/' + subreddit + ' Submissions in the Past ' + days + ' Days',
       xaxis: {
         title: 'Hour of Submission',
         ticks: ' ',
@@ -69,6 +85,6 @@ export class DashboardComponent implements OnInit {
       }
     };
 
-    Plotly.plot(element, data, layout)
+    Plotly.newPlot(element, data, layout)
   }
 }

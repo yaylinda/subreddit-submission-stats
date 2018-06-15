@@ -11,7 +11,7 @@
             <input type="number" min=1 class="form-control" id="days" required [(ngModel)]="requestFormDays" name="days" #name="ngModel">
         </div>
 
-        <button type="submit" class="btn btn-success" [disabled]="!requestForm.form.valid">Submit</button>
+        <button type="submit" class="btn btn-success" [disabled]="!requestForm.form.valid || !submitAvailable">{{ buttonText }}</button>
     </form>
 
     <div #meanscores>

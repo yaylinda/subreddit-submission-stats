@@ -22,7 +22,7 @@ def generate_data(subreddit, days=10):
 
     queue = Queue()
     
-    for x in range(8):
+    for x in range(16):
        worker = DownloadWorker(queue, subreddit, x)
        worker.daemon = True
        worker.start()
@@ -71,7 +71,7 @@ def transform_data(subreddit, data, column):
 
         means.append(means_for_day)
 
-    print(means)
+    # print(means)
 
     return means
 
@@ -148,7 +148,7 @@ if __name__ == '__main__':
         days = 10
     data = generate_data(subreddit, days)
 
-    print(data)
+    # print(data)
 
     # Write data to CSV
     # write_data_to_csv(subreddit, data)

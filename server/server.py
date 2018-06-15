@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 
+from constants import *
 from subreddit_score import *
 
 app = Flask(__name__)
@@ -26,10 +27,10 @@ def generate(subreddit, days):
     data = generate_data(str(subreddit), int(days))
 
     # Transform data for plotting
-    score_means = transform_data(subreddit, data, column_names[3])
+    score_means = transform_data(subreddit, data, COLUMN_NAMES[3])
     score_means.reverse() # reverse data for day of the week
 
-    num_comments_means = transform_data(subreddit, data, column_names[1])
+    num_comments_means = transform_data(subreddit, data, COLUMN_NAMES[1])
     num_comments_means.reverse() # reverse data for day of the week
 
     return jsonify(

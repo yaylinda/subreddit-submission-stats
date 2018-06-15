@@ -22,15 +22,6 @@ def generate(subreddit, days):
 
     print('Generating data and plot... [subreddit = %s] [days = %s]' % (subreddit, days))
 
-    # Make sure Subreddit is valid
-    if not validate_subreddit(subreddit):
-        return jsonify(
-            status = 'ERROR',
-            message = 'Incorrect value for [subreddit].',
-            subreddit = subreddit, 
-            days = days
-        )
-
     # Obtain raw data using pushshift.io
     data = generate_data(str(subreddit), int(days))
 

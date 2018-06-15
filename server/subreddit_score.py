@@ -1,28 +1,13 @@
 import csv
 import sys
-import datetime
-import requests
 import statistics
 import plotly
 import plotly.graph_objs as go
 import time
+from download_worker import DownloadWorker
+from queue import Queue
 
 from constants import *
-
-"""
-Helper function to ensure input subreddit string is a valid subreddit.
-
-    Input:
-        - subreddit: subreddit string
-
-    Returns:
-        - boolean of whether or not subreddit is valid
-"""
-def validate_subreddit(subreddit):
-
-    # TODO - validate subreddit
-
-    return True
 
 
 """
@@ -31,35 +16,31 @@ def generate_data(subreddit, days=10):
 
     print('[use_pushshift] Obtaining submissions from [/r/%s]' % subreddit)
 
-    data = []
-
     start = time.time()
 
+    workers = []
+
+    queue = Queue()
+    
+    for x in range(8):
+       worker = DownloadWorker(queue, subreddit, x)
+       worker.daemon = True
+       worker.start()
+       workers.append(worker)
+
     for i in range(0, int(days)):
+        queue.put(i)
 
-        url = URL_TEMPLATE % (subreddit, str(i), str(i+1))
+    queue.join()
 
-        r = requests.get(url)
-        
-        data_per_day = 0
-        for submission in r.json()['data']:
-            datum = {}
-            for col_name in COLUMN_NAMES:
-            
-                if col_name == COLUMN_NAMES[4]:
-                    datum[COLUMN_NAMES[4]] = int(datetime.datetime.fromtimestamp(datum['created_utc']).strftime('%H'))
-                elif col_name == COLUMN_NAMES[5]:
-                    datum[COLUMN_NAMES[5]] = datetime.datetime.fromtimestamp(datum['created_utc']).strftime('%a')
-                else:
-                    datum[col_name] = submission[col_name]
-
-            data.append(datum)
-            data_per_day = data_per_day + 1
-
-        print('\tObtained %s data points [before=%sd] [after=%sd]' % (str(data_per_day), str(i), str(i+1)))
+    data = []
+    for w in workers:
+        for worker_data in w.get_all_data():
+            data.append(worker_data)
 
     print('Took %d seconds.' % (time.time() - start))
     return data
+
 
 """
 """

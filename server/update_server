@@ -1,0 +1,3 @@
+docker build -t gcr.io/subreddit-submission-stats/server .
+gcloud container clusters get-credentials staging --zone us-east1-c --project subreddit-submission-stats
+gcloud docker -- push gcr.io/subreddit-submission-stats/server

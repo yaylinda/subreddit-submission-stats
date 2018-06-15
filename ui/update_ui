@@ -1,0 +1,5 @@
+npm build --prod
+docker build -t gcr.io/subreddit-submission-stats-ui/ui .
+gcloud docker -- push gcr.io/subreddit-submission-stats-ui/ui
+gcloud container clusters get-credentials staging --zone us-east1-c --project subreddit-submission-stats-ui
+

@@ -16,6 +16,7 @@ export class DashboardComponent implements OnInit {
 
   buttonText = 'Submit';
   submitAvailable = true;
+  requestTimeTaken = '';
 
   requestFormSubreddit;
   requestFormDays;
@@ -33,17 +34,21 @@ export class DashboardComponent implements OnInit {
 
     this.buttonText = 'Processing...';
     this.submitAvailable = false;
+    this.requestTimeTaken = '';
 
     let loader = '<div class="loader" style="border:16px solid #f3f3f3; border-top:16px solid #3498db; border-radius: 50%; width:60px; height:60px; animation: spin 4s linear infinite; margin: auto auto;"></div>';
     this._renderer.setElementProperty(this.meanScoresElementRef.nativeElement, 'innerHTML', loader);
     this._renderer.setElementProperty(this.meanCommentsElementRef.nativeElement, 'innerHTML', loader);
 
     const requestFormSubredditCleaned = this.requestFormSubreddit.replace('/r/', '').replace('r/', '').replace('/', '')
+
+    let start = new Date().getTime();
     this.http.get(this.baseUrl + requestFormSubredditCleaned + '/' + this.requestFormDays)
       .subscribe((result) => {
 
         this.buttonText = 'Submit';
         this.submitAvailable = true;
+        this.calculateTimeDiff(start, new Date().getTime());
 
         this._renderer.setElementProperty(this.meanScoresElementRef.nativeElement, 'innerHTML', '');
         this._renderer.setElementProperty(this.meanCommentsElementRef.nativeElement, 'innerHTML', '');
@@ -92,5 +97,19 @@ export class DashboardComponent implements OnInit {
     };
 
     Plotly.newPlot(element, data, layout)
+  }
+
+  calculateTimeDiff(start, end) {
+    this.requestTimeTaken;
+
+    let diffSeconds = (end - start) / 1000;
+    
+    if (diffSeconds < 60) {
+      this.requestTimeTaken = `Took ${diffSeconds} seconds.`;
+    } else if (diffSeconds >= 60 && diffSeconds < 3600) {
+      this.requestTimeTaken = `Took ${diffSeconds / 60} minutes.`;
+    } else {
+      this.requestTimeTaken = `Took ${(diffSeconds / 60) / 60} hours.`;
+    }
   }
 }

@@ -1,18 +1,22 @@
 <div>
+
+    <hr>
+
     <form (ngSubmit)="onSubmit()" #requestForm="ngForm">
 
         <div class="form-group">
-            <label for="name">Subreddit</label>
-            <input type="text" class="form-control" id="subreddit" required [(ngModel)]="requestFormSubreddit" name="subreddit" #name="ngModel">
+            <input placeholder="Subreddit" type="text" class="form-control" id="subreddit" required [(ngModel)]="requestFormSubreddit" name="subreddit" #name="ngModel">
         </div>
 
         <div class="form-group">
-            <label for="name">Number of Days</label>
-            <input type="number" min=1 class="form-control" id="days" required [(ngModel)]="requestFormDays" name="days" #name="ngModel">
+            <input placeholder="Days" type="number" min=1 class="form-control" id="days" required [(ngModel)]="requestFormDays" name="days" #name="ngModel">
         </div>
 
-        <button type="submit" class="btn btn-success" [disabled]="!requestForm.form.valid || !submitAvailable">{{ buttonText }}</button>
+        <button type="submit" class="btn btn-success" [disabled]="!requestForm.form.valid || !submitAvailable || requestFormDays <= 1">{{ buttonText }}</button>
+    
     </form>
+
+    <hr>
 
     <div #meanscores>
         <!-- Chart will appear here -->

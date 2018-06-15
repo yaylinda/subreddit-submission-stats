@@ -68,7 +68,8 @@ export class DashboardComponent implements OnInit {
         x: hours,
         y: weekdays,
         z: means,
-        type: 'heatmap'
+        type: 'heatmap',
+        colorscale: 'Viridis'
       }
     ];
 

@@ -1,0 +1,36 @@
+/* form {
+    text-align: center;
+} */
+
+.form-group {
+    display: inline-block;
+    margin-right: 20px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+input {
+    text-align: center;
+    font-size: 20px;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    border-bottom: 2px solid blueviolet;
+    width: 200px;
+}
+
+button {
+    font-size: 20px;
+    height: 30px;
+    width: 150px;
+    border: 2px solid blueviolet;
+    background: white;
+    border-radius: 10px;
+}
+
+button:hover {
+    cursor: pointer;
+    background: plum;
+}
+
+

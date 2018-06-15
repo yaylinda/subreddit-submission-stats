@@ -105,11 +105,11 @@ export class DashboardComponent implements OnInit {
     let diffSeconds = (end - start) / 1000;
     
     if (diffSeconds < 60) {
-      this.requestTimeTaken = `Took ${diffSeconds} seconds.`;
+      this.requestTimeTaken = `Took ${diffSeconds.toFixed(2)} seconds.`;
     } else if (diffSeconds >= 60 && diffSeconds < 3600) {
-      this.requestTimeTaken = `Took ${diffSeconds / 60} minutes.`;
+      this.requestTimeTaken = `Took ${(diffSeconds / 60).toFixed(2)} minutes.`;
     } else {
-      this.requestTimeTaken = `Took ${(diffSeconds / 60) / 60} hours.`;
+      this.requestTimeTaken = `Took ${((diffSeconds / 60) / 60).toFixed(2)} hours.`;
     }
   }
 }

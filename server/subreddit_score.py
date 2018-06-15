@@ -41,7 +41,7 @@ def generate_data(subreddit, days=10):
 
     print('[use_pushshift] Obtaining submissions from [/r/%s]' % subreddit)
 
-    url_template = 'https://api.pushshift.io/reddit/search/submission?subreddit=%s&before=%sd&after=%sd&size=1000'
+    url_template = 'https://api.pushshift.io/reddit/search/submission?subreddit=%s&before=%sd&after=%sd&size=1000&score=>1'
     data = []
 
     for i in range(0, int(days)):
@@ -97,6 +97,8 @@ def transform_data(subreddit, data, column):
             means_for_day.append(stats)
 
         means.append(means_for_day)
+
+    print(means)
 
     return means
 

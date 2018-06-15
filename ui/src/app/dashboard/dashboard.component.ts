@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, Renderer } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../environments/environment';
 
@@ -14,14 +14,13 @@ export class DashboardComponent implements OnInit {
 
   baseUrl = 'http://' + environment.serverUrl + ':5000/generate/';
 
-  submitted = false;
-  submitAvailable = true;
   buttonText = 'Submit';
+  submitAvailable = true;
 
   requestFormSubreddit;
   requestFormDays;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private _renderer: Renderer) {}
 
   ngOnInit() {
     // this.plotChart(this.meanScoresElementRef.nativeElement, [], '<SUBREDDIT>', '<DAYS>', 'Score');
@@ -32,16 +31,22 @@ export class DashboardComponent implements OnInit {
     console.log(this.requestFormSubreddit)
     console.log(this.requestFormDays)
 
-    this.submitted = true;
-    this.submitAvailable = false;
     this.buttonText = 'Processing...';
-    
-    this.http.get(this.baseUrl + this.requestFormSubreddit + '/' + this.requestFormDays)
+    this.submitAvailable = false;
+
+    let loader = '<div class="loader" style="border:16px solid #f3f3f3; border-top:16px solid #3498db; border-radius: 50%; width:60px; height:60px; animation: spin 4s linear infinite; margin: auto auto;"></div>';
+    this._renderer.setElementProperty(this.meanScoresElementRef.nativeElement, 'innerHTML', loader);
+    this._renderer.setElementProperty(this.meanCommentsElementRef.nativeElement, 'innerHTML', loader);
+
+    const requestFormSubredditCleaned = this.requestFormSubreddit.replace('/r/', '').replace('r/', '').replace('/', '')
+    this.http.get(this.baseUrl + requestFormSubredditCleaned + '/' + this.requestFormDays)
       .subscribe((result) => {
 
-        this.submitted = false;
-        this.submitAvailable = true;
         this.buttonText = 'Submit';
+        this.submitAvailable = true;
+
+        this._renderer.setElementProperty(this.meanScoresElementRef.nativeElement, 'innerHTML', '');
+        this._renderer.setElementProperty(this.meanCommentsElementRef.nativeElement, 'innerHTML', '');
 
         console.log(result)
 

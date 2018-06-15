@@ -1,3 +1,12 @@
-docker build -t gcr.io/subreddit-submission-stats/server .
+echo 'Building new Docker Image...'
+docker build -t gcr.io/subreddit-submission-stats/server:latest .
+
 gcloud container clusters get-credentials staging --zone us-east1-c --project subreddit-submission-stats
-gcloud docker -- push gcr.io/subreddit-submission-stats/server
+
+echo 'Pushing Docker Image to gcr.io...'
+gcloud docker -- push gcr.io/subreddit-submission-stats/server:latest
+
+echo 'Setting new Docker Image in Kubernetes Deployment...'
+kubectl set image deployment/subreddit-submission-stats-server subreddit-submission-stats-server=gcr.io/subreddit-submission-stats/server:latest
+
+echo 'Updated!'

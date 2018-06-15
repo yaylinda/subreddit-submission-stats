@@ -1,5 +1,15 @@
-npm build --prod
-docker build -t gcr.io/subreddit-submission-stats-ui/ui .
-gcloud docker -- push gcr.io/subreddit-submission-stats-ui/ui
+echo 'Building project into /dist...'
+ng build --prod
+
+echo 'Building new Docker Image...'
+docker build -t gcr.io/subreddit-submission-stats-ui/ui:latest .
+
 gcloud container clusters get-credentials staging --zone us-east1-c --project subreddit-submission-stats-ui
 
+echo 'Pushing Docker Image to gcr.io...'
+gcloud docker -- push gcr.io/subreddit-submission-stats-ui/ui:latest
+
+echo 'Setting new Docker Image in Kubernetes Deployment...'
+kubectl set image deployment/subreddit-submission-stats-ui subreddit-submission-stats-ui=gcr.io/subreddit-submission-stats-ui/ui:latest
+
+echo 'Updated!'

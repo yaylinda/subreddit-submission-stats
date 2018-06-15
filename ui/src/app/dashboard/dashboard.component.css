@@ -33,6 +33,11 @@ button:hover {
     background: plum;
 }
 
+.small-info {
+    font-size: 12px;
+    color: lightslategray
+}
+
 .chart-wrapper {
     border: 2px solid blueviolet;
     border-radius: 10px;
